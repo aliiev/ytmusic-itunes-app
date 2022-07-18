@@ -50,6 +50,7 @@ class App(QMainWindow, Ui_MainWindow):
         self.thread.finished.connect(lambda: self.outputTextEdit.append('Files copied successfully.'))
         self.thread.finished.connect(self.enableInputs)
         self.thread.finished.connect(self.resetProgress)
+        self.thread.finished.connect(self.downloadedCount)
 
         self.thread.start()
         self.outputTextEdit.append('Copying music to iTunes folder...')
@@ -84,10 +85,11 @@ class App(QMainWindow, Ui_MainWindow):
         self.speedLabel.setText('0 KiB/s')
 
     def downloadedCount(self):
-        _translate = QtCore.QCoreApplication.translate
-        count = len([f for f in os.listdir('downloads') if os.path.isfile(os.path.join('downloads', f))])
-        size = round(sum(d.stat().st_size for d in os.scandir('downloads') if d.is_file()) / 1024 / 1024, 1)
-        self.deleteCheckBox.setText(_translate("MainWindow", "Delete earlier downloaded files ({} tracks | {} Mb)".format(count, size)))
+        if os.path.isdir('downloads'):
+            _translate = QtCore.QCoreApplication.translate
+            count = len([f for f in os.listdir('downloads') if os.path.isfile(os.path.join('downloads', f))])
+            size = round(sum(d.stat().st_size for d in os.scandir('downloads') if d.is_file()) / 1024 / 1024, 1)
+            self.deleteCheckBox.setText(_translate("MainWindow", "Delete earlier downloaded files ({} tracks | {} Mb)".format(count, size)))
 
     def downloadBtnClick(self):
         if self.urlInput.text() != '' and self.folderInput.text() != '':
